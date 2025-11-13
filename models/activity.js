@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const activitySchema = new mongoose.Schema({
     createdBy: {
         type: mongoose.Types.ObjectId,
-        ref: "User",
+        ref: "user",
         required: true
     },
     text: {
@@ -16,4 +16,4 @@ const activitySchema = new mongoose.Schema({
     }
 })
 
-export const activityModel = mongoose.model("Activity", activitySchema);
+export const activityModel = mongoose.model("activity", activitySchema);

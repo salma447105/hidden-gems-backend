@@ -14,9 +14,11 @@
   "description": "",
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "express-validator": "^7.3.0",
     "mongoose": "^8.19.3",
-    "nodemon": "^3.1.11"
+    "nanoid": "^5.1.6",
+    "nodemon": "^3.1.11",
+    "uuid": "^13.0.0"
   }
 }
