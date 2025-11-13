@@ -8,6 +8,11 @@ const port = 3000;
 //   next(new AppError(`can't find this route: ${req.originalUrl}`, 404));
 // });
 
+
+
+app.use(express.json());
+
+// app.use('gems',)
 app.use(globalMiddleWare);
 app.get("/", (req, res) => res.send("Hello World!"));
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));

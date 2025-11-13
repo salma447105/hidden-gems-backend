@@ -3,7 +3,7 @@ const reviewSchem = new mongoose.Schema({
     createdBy: {
         type: mongoose.Types.ObjectId,
         required: true,
-        ref: "User" 
+        ref: "user" 
     },
     description: {
         type: String,
@@ -12,11 +12,11 @@ const reviewSchem = new mongoose.Schema({
     gemId: {
         type: mongoose.Types.ObjectId,
         required: true,
-        ref: "Gem"
+        ref: "gem"
     },
     imgages: {
         type: [String],
     }
 })
 
-export const reviewModel = mongoose.model("Review", reviewSchem)
+export const reviewModel = mongoose.model("review", reviewSchem)
