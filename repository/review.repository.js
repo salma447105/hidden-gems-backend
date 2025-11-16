@@ -14,6 +14,6 @@ export const deleteReviewById = async (id) => {
 }
 
 export const updateReviewById = async (id, updatedFields) => {
-    return await reviewModel.findByIdAndUpdate(id,  {$set: {updatedFields} }, {new: true});
+    return await reviewModel.findByIdAndUpdate(id,  {$set: updatedFields }, {new: true});
 }
 

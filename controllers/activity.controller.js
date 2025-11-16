@@ -14,7 +14,7 @@ const postActivity = catchAsyncError(async (req, res) => {
     //check user exist
     const activity = req.body;
 
-    const createdActivity = createActivityForUser(activity);
+    const createdActivity = await createActivityForUser(activity);
     return res.status(201).send(createdActivity);
 })
 

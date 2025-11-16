@@ -23,6 +23,10 @@ const gemSchema = new mongoose.Schema({
     ref: "user",
     require: true,
   },
+  isSubscribed: {
+    type: Boolean,
+    default: false
+  }
 });
 
 export const gemModel = mongoose.model("gem", gemSchema);
