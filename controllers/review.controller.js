@@ -2,6 +2,7 @@ import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import { createReview, deleteReviewById, getAllReviewsForGem, updateReviewById } from "../repository/review.repository.js";
 import { AppError } from "../utils/AppError.js";
 
+
 const getAllReviews = catchAsyncError(async (req, res, next) => {
     const gemId = req.params.id;
     const reviewsList = await getAllReviewsForGem(gemId);

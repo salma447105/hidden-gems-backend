@@ -32,12 +32,10 @@ const signUp = catchAsyncError(async (req, res, next) => {
      <h1>${result.code}</h1>`
   );
 
-  res
-    .status(201)
-    .json({
-      message: "User registered successfully. Please verify your email.",
-      result,
-    });
+  res.status(201).json({
+    message: "User registered successfully. Please verify your email.",
+    result,
+  });
 });
 
 const signIn = catchAsyncError(async (req, res, next) => {
@@ -51,11 +49,9 @@ const signIn = catchAsyncError(async (req, res, next) => {
   if (!user.verified)
     return next(new AppError(`Please verify your email first`, 403));
 
-  let token = jwt.sign(
-    { userInfo:user },
-    process.env.JWT_KEY,
-    { expiresIn: "7d" }
-  );
+  let token = jwt.sign({ userInfo: user }, process.env.JWT_KEY, {
+    expiresIn: "7d",
+  });
 
   res
     .cookie("token", token, {
@@ -85,19 +81,16 @@ const VerifyUser = catchAsyncError(async (req, res, next) => {
     .json({ message: "Successfully verified! You can sign in now." });
 });
 
-
-
 const forgetPassword = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
 
   let user = await userModel.findOne({ email });
   if (!user) return next(new AppError(`Email not found`, 404));
 
-  
   user.code = uuidv4();
   await user.save();
 
-    await sendEmail(
+  await sendEmail(
     email,
     "Password Reset Code",
     `<p>Your password reset code is:</p><h1>${user.code}</h1>`
@@ -106,42 +99,35 @@ const forgetPassword = catchAsyncError(async (req, res, next) => {
   res.status(200).json({ message: "Password reset code sent to your email." });
 });
 
-
 const resetPassword = catchAsyncError(async (req, res, next) => {
-  const { email,code,newPassword } = req.body;
+  const { email, code, newPassword } = req.body;
 
   let user = await userModel.findOne({ email });
   if (!user) return next(new AppError(`Email not found`, 404));
 
-  
-if (code !== user.code)
+  if (code !== user.code)
     return next(new AppError(`Invalid verification code`, 400));
 
-  user.password = bcrypt.hashSync(
-    newPassword,
-    Number(process.env.SALT_ROUNDS)
-  );
+  user.password = bcrypt.hashSync(newPassword, Number(process.env.SALT_ROUNDS));
   user.code = null;
   user.passwordChangedAt = new Date();
   await user.save();
 
-
   res.status(200).json({ message: "Password Reset Successful" });
 });
- const logout = (req, res) => {
+const logout = (req, res) => {
   res
     .clearCookie("token", {
       httpOnly: true,
-      secure: true,     
-      sameSite: "none",  
+      secure: true,
+      sameSite: "none",
     })
     .status(200)
     .json({ message: "Logged out successfully" });
 };
 
-
 const protectedRoutes = catchAsyncError(async (req, res, next) => {
-  const token = req.cookies.token; 
+  const token = req.cookies.token;
 
   if (!token) return next(new AppError("Token Not Provided", 401));
 
@@ -152,7 +138,6 @@ const protectedRoutes = catchAsyncError(async (req, res, next) => {
     return next(new AppError("Invalid token", 401));
   }
 
-  
   let user = await userModel.findById(decoded.userInfo._id);
   if (!user) return next(new AppError("User no longer exists", 401));
 
@@ -166,12 +151,26 @@ const protectedRoutes = catchAsyncError(async (req, res, next) => {
   next();
 });
 
- const allowedTo = (...roles) => {
+const allowedTo = (...roles) => {
   return catchAsyncError(async (req, res, next) => {
     if (!roles.includes(req.user.role))
-      return next(new AppError(`You Are Not Authorized to access.You Are ${req.user.role}`,401));
+      return next(
+        new AppError(
+          `You Are Not Authorized to access.You Are ${req.user.role}`,
+          401
+        )
+      );
     next();
   });
 };
-  
-export { signUp, signIn, VerifyUser ,logout,allowedTo,protectedRoutes,forgetPassword,resetPassword};
+
+export {
+  signUp,
+  signIn,
+  VerifyUser,
+  logout,
+  allowedTo,
+  protectedRoutes,
+  forgetPassword,
+  resetPassword,
+};

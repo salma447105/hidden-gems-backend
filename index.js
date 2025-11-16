@@ -9,7 +9,7 @@ import userRouter from "./route/user.route.js";
 import categoryRouter from "./route/category.router.js";
 import activityRouter from "./route/activity.route.js";
 import reviewRouter from "./route/review.routes.js";
-
+import gemRouter from "./route/gem.route.js";
 dotenv.config();
 
 const app = express();
@@ -30,6 +30,7 @@ app.use("/activity", activityRouter);
 app.use("/review", reviewRouter);
 app.use("/users", userRouter);
 app.use("/categories", categoryRouter);
+app.use("/gems", gemRouter);
 
 app.use(globalMiddleWare);
 

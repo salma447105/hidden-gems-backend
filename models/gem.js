@@ -11,17 +11,17 @@ const gemSchema = new mongoose.Schema({
     default: "pending",
   },
   discount: { type: Number, default: 0 },
-  discoountPremium: { type: Number, default: 0 },
+  discountPremium: { type: Number, default: 0 },
   avgRating: { type: Number, default: 0 },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "category",
-    require: true,
+    required: true,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
-    require: true,
+    required: true,
   },
   isSubscribed: {
     type: Boolean,
