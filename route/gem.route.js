@@ -12,9 +12,10 @@ import { gemSchema } from "../validation/gem.validation.js";
 import { allowedTo, protectedRoutes } from "../controllers/auth.controller.js";
 
 const gemRouter = express.Router();
+let filedsArray=[ { name: 'images', maxCount: 10 }]
 
 gemRouter.route("/")
-    .post(protectedRoutes,allowedTo("admin"), uploadMultipleFile("images", "gem"), validation(gemSchema), createGem)
+    .post(protectedRoutes,allowedTo("admin"), uploadMultipleFile(filedsArray, "gem"), validation(gemSchema), createGem)
     .get(getAllGems);
     
 

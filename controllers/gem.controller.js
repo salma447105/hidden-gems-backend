@@ -9,7 +9,9 @@ const getAllGems = catchAsyncError(async (req, res, next) => {
     .sort()
     .fields()
     .filter()
-    .search();
+    .search()
+
+
   let result = await apifeatures.mongooseQuery;
   res.status(200).json({ message: "success", page: apifeatures.page, result });
 });
@@ -29,10 +31,11 @@ const createGem = catchAsyncError(async (req, res, next) => {
   if (req.user.role === "admin") {
     status = "accepted";
   }
+// console.log(req.files?.images);
 
   let gemData = {
     ...req.body,
-    image: req.file?.filename,
+    images: req.files.images.map(obj => obj.filename),
     status: status,
     createdBy: req.user._id,
   };

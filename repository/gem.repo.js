@@ -2,7 +2,9 @@ import mongoose from "mongoose";
 import { gemModel } from "../models/gem.js";
 
  const getGems = async () => {
-    return await gemModel.find();
+    console.log("ok");
+    
+    return await gemModel.find({});
 };
 
  const getGem = async (id) => {
