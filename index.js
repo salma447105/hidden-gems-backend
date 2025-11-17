@@ -38,4 +38,4 @@ mongoose.connect(process.env.DB_URL)
   .then(() => console.log("DB Connected"))
   .catch((err) => console.error(" DB Connection Failed:", err));
 
-app.listen(port, () => console.log(` Server running on port ${port}`));
+app.listen(port, () => console.log(`Server running on port ${port}`));

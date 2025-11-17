@@ -12,3 +12,16 @@ export const gemSchema = Joi.object({
   avgRating: Joi.number().min(0).max(5).optional(),
 });
 
+
+export const gemUpdateSchema = Joi.object({
+  name: Joi.string().min(3).max(100).optional(),
+  images: Joi.array().items(Joi.string().uri()).optional(),
+  gemLocation: Joi.string().optional(),
+  description: Joi.string().min(10).optional(),
+  category: Joi.string().hex().length(24).optional(),
+  discount: Joi.number().min(0).max(90).optional(),
+  discountPremium: Joi.number().min(0).max(100).optional(),
+  status: Joi.string().valid("pending", "rejected", "accepted").optional(),
+  avgRating: Joi.number().min(0).max(5).optional(),
+});
+

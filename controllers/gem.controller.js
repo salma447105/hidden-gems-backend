@@ -1,15 +1,15 @@
 import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import { AppError } from "../utils/AppError.js";
 import { ApiFeatures } from "../utils/ApiFeatures.js";
-import { getGems, getGem, createTheGem, updateTheGem, deleteTheGem, findGemByName } from "../repository/gem.repo.js";
+import { getGemsPromise,getGemsQuery, getGem, createTheGem, updateTheGem, deleteTheGem, findGemByName } from "../repository/gem.repo.js";
 
 const getAllGems = catchAsyncError(async (req, res, next) => {
-  let apifeatures = new ApiFeatures(getGems(), req.query)
+  let apifeatures = new ApiFeatures(getGemsQuery(), req.query)
     .paginate()
     .sort()
     .fields()
     .filter()
-    .search()
+    .search();
 
 
   let result = await apifeatures.mongooseQuery;
@@ -71,7 +71,7 @@ const updateGem = catchAsyncError(async (req, res, next) => {
       ...req.body,
       status: "pending",
     };
-
+    // console.log("updateData:", updateData);
     result = await updateTheGem(id, updateData);
     res.status(200).json({
         message: "your gem updated successfully, waiting for admin approval ",

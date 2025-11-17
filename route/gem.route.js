@@ -8,7 +8,7 @@ import {
 } from "../controllers/gem.controller.js";
 import { uploadMultipleFile } from "../middleware/fileUpload.js";
 import { validation } from "../middleware/validation.js";
-import { gemSchema } from "../validation/gem.validation.js";
+import { gemSchema, gemUpdateSchema } from "../validation/gem.validation.js";
 import { allowedTo, protectedRoutes } from "../controllers/auth.controller.js";
 
 const gemRouter = express.Router();
@@ -26,8 +26,8 @@ gemRouter
   .put(
     protectedRoutes,
     allowedTo("admin"),
-    uploadMultipleFile("images", "gem"),
-    validation(gemSchema),
+    uploadMultipleFile(filedsArray, "gem"),
+    validation(gemUpdateSchema),
     updateGem
   );
 

@@ -1,7 +1,11 @@
-
 export class ApiFeatures {
 
     constructor(mongooseQuery, queryString) {
+
+        // console.log('🔍 mongooseQuery type:', typeof mongooseQuery);
+        // console.log('🔍 mongooseQuery methods:', Object.getOwnPropertyNames(mongooseQuery));
+        // console.log('🔍 Has skip method?', typeof mongooseQuery.skip === 'function');
+    
         this.mongooseQuery = mongooseQuery
         this.queryString = queryString
     }
