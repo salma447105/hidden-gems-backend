@@ -1,13 +1,20 @@
 import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import { createReview, deleteReviewById, getAllReviewsForGem, updateReviewById } from "../repository/review.repository.js";
+import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { AppError } from "../utils/AppError.js";
 
 
 const getAllReviews = catchAsyncError(async (req, res, next) => {
     const gemId = req.params.id;
-    const reviewsList = await getAllReviewsForGem(gemId);
-    console.log(reviewsList);
-    return res.status(200).send(reviewsList);
+    const apifeatures = new ApiFeatures(getAllReviewsForGem(gemId), req.query)
+        .paginate()
+        .sort()
+        .fields()
+        .filter()
+        .search();
+    let result = await apifeatures.mongooseQuery;
+    // const reviewsList = await getAllReviewsForGem(gemId);
+    return res.status(200).send(result);
 })
 
 const postReview = catchAsyncError(async (req, res, next) => {

@@ -1,12 +1,20 @@
 import { catchAsyncError } from "../middleware/catchAsyncError.js";
 import { getAllActivitiesForUser, createActivityForUser, deleteActivityById} from "../repository/activity.repository.js";
+import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { AppError } from "../utils/AppError.js";
 
 const getAllActivities = catchAsyncError(async (req, res) => {
     const userId = req.params.id;
     //check user exist
-    const activityList = await getAllActivitiesForUser(userId);
-    return res.status(200).send(activityList);
+    const features = new ApiFeatures(getAllActivitiesForUser(userId), req.query)
+        .paginate()
+        .sort()
+        .fields()
+        .filter()
+        .search();    
+    const result = features.mongooseQuery;
+    // const activityList = await getAllActivitiesForUser(userId);
+    return res.status(200).send(result);
 })
 
 const postActivity = catchAsyncError(async (req, res) => {
