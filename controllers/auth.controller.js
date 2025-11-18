@@ -19,7 +19,7 @@ const signUp = catchAsyncError(async (req, res, next) => {
     ...req.body,
     password: hashedPassword,
     image: req.file?.filename,
-    code: uuidv4(),
+    code: Math.floor(100000 + Math.random() * 900000).toString(),
   });
 
   await result.save();
@@ -87,7 +87,7 @@ const forgetPassword = catchAsyncError(async (req, res, next) => {
   let user = await userModel.findOne({ email });
   if (!user) return next(new AppError(`Email not found`, 404));
 
-  user.code = uuidv4();
+  user.code = Math.floor(100000 + Math.random() * 900000).toString();
   await user.save();
 
   await sendEmail(
@@ -151,6 +151,21 @@ const protectedRoutes = catchAsyncError(async (req, res, next) => {
   next();
 });
 
+const getCurrentUser = catchAsyncError(async (req, res, next) => {
+  res.status(200).json({
+    authenticated: true,
+    user: {
+      id: req.user._id,
+      email: req.user.email,
+      firstName: req.user.firstName,
+      lastName: req.user.lastName,
+      role: req.user.role,
+      image: req.user.image,
+      subscription: req.user.subscription,
+      points: req.user.points,
+    },
+  });
+});
 const allowedTo = (...roles) => {
   return catchAsyncError(async (req, res, next) => {
     if (!roles.includes(req.user.role))
@@ -173,4 +188,5 @@ export {
   protectedRoutes,
   forgetPassword,
   resetPassword,
+  getCurrentUser
 };
