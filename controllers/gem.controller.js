@@ -4,17 +4,33 @@ import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { getGemsPromise,getGemsQuery, getGem, createTheGem, updateTheGem, deleteTheGem, findGemByName } from "../repository/gem.repo.js";
 
 const getAllGems = catchAsyncError(async (req, res, next) => {
-  let apifeatures = new ApiFeatures(getGemsQuery(), req.query)
-    .paginate()
-    .sort()
-    .fields()
+  
+  const countQuery = new ApiFeatures(getGemsQuery(), req.query)
     .filter()
     .search();
+    
+  const totalItems = await countQuery.mongooseQuery.countDocuments();
 
+  const apifeatures = new ApiFeatures(getGemsQuery(), req.query)
+    .filter()
+    .search()
+    .sort()
+    .fields()
+    .paginate();
 
-  let result = await apifeatures.mongooseQuery;
-  res.status(200).json({ message: "success", page: apifeatures.page, result });
+  const result = await apifeatures.mongooseQuery;
+
+  const totalPages = Math.ceil(totalItems / apifeatures.limit);
+
+  return res.status(200).json({
+    message: "success",
+    page: apifeatures.page,
+    totalItems,
+    totalPages,
+    result,
+  });
 });
+
 
 const getGemById = catchAsyncError(async (req, res, next) => {
   const { id } = req.params;

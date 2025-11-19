@@ -1,10 +1,10 @@
 import {activityModel} from "../models/activity.js";
 import mongoose from "mongoose";
-export const getAllActivitiesForUser = async (userId) => {
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-        throw new Error("Invalid user ID");
-    }
-    return await activityModel.find({userId: userId});
+
+
+
+export const getAllActivitiesForUser = (userId) => {
+    return activityModel.find({ userId });
 }
 
 export const createActivityForUser = async (activity)=> {

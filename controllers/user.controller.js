@@ -47,15 +47,30 @@ const getUser = catchAsyncError(async (req, res, next) => {
 });
 
 const getAllUsers = catchAsyncError(async (req, res, next) => {
+  
+  let countQuery = new ApiFeatures(userModel.find({}), req.query).filter().search();
+  let totalItems = await countQuery.mongooseQuery.countDocuments();
+
   let apifeatures = new ApiFeatures(userModel.find({}), req.query)
-    .paginate()
+    .filter()
+    .search()
     .sort()
     .fields()
-    .filter()
-    .search();
+    .paginate();
+
   let result = await apifeatures.mongooseQuery;
-  res.status(200).json({ message: "success", page: apifeatures.page, result });
+
+  const totalPages = Math.ceil(totalItems / apifeatures.limit);
+
+  res.status(200).json({
+    message: "success",
+    page: apifeatures.page,
+    totalItems,
+    totalPages,
+    result
+  });
 });
+
 
 const updateUser = catchAsyncError(async (req, res, next) => {
   const { id } = req.params;

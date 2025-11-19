@@ -11,14 +11,20 @@ export class ApiFeatures {
     }
 
     //1-pagination
-    paginate() {
-        let page = this.queryString.page * 1 || 1
-        if (this.queryString.page <= 0) page = 1
-        let skip = (page - 1) * 5 //(limit)
-        this.page = page
-        this.mongooseQuery.skip(skip).limit(5)
-        return this
-    }
+paginate() {
+    let page = this.queryString.page * 1 || 1;
+    if (page <= 0) page = 1;
+
+    let limit = this.queryString.limit * 1 || 10;
+    let skip = (page - 1) * limit;
+
+    this.page = page;
+    this.limit = limit;
+
+    this.mongooseQuery.skip(skip).limit(limit);
+    return this;
+}
+
 
     //2-filter
     filter() {
@@ -47,7 +53,7 @@ export class ApiFeatures {
     //4-search
     search() {
         if (this.queryString.keyword) {
-            mongooseQuery.find({
+            this.mongooseQuery.find({
                 $or: [
                     { title: { $regex: this.queryString.keyword, $options: "i" } },
                     { description: { $regex: this.queryString.keyword, $options: "i" } },

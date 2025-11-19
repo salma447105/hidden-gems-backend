@@ -8,7 +8,7 @@ import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { categoryModel } from "../models/category.js";
 
 const createCategory = catchAsyncError(async (req, res, next) => {
-  let isExist = await userModel.findOne({ categoryName: req.body.categoryName });
+  let isExist = await categoryModel.findOne({ categoryName: req.body.categoryName });
   if (isExist) return next(new AppError(`Category already exists`, 400));
 
  
@@ -40,15 +40,33 @@ const getCategory = catchAsyncError(async (req, res, next) => {
 });
 
 const getAllCategories = catchAsyncError(async (req, res, next) => {
-  let apifeatures = new ApiFeatures(categoryModel.find({}), req.query)
-    .paginate()
-    .sort()
-    .fields()
+
+  const countQuery = new ApiFeatures(categoryModel.find({}), req.query)
     .filter()
     .search();
-  let result = await apifeatures.mongooseQuery;
-  res.status(200).json({ message: "success", page: apifeatures.page, result });
+
+  const totalItems = await countQuery.mongooseQuery.countDocuments();
+
+  const apifeatures = new ApiFeatures(categoryModel.find({}), req.query)
+    .filter()
+    .search()
+    .sort()
+    .fields()
+    .paginate();
+
+  const result = await apifeatures.mongooseQuery;
+
+  const totalPages = Math.ceil(totalItems / apifeatures.limit);
+
+  res.status(200).json({
+    message: "success",
+    page: apifeatures.page,
+    totalItems,
+    totalPages,
+    result,
+  });
 });
+
 
 const updateCategory = catchAsyncError(
     async (req, res, next) => {

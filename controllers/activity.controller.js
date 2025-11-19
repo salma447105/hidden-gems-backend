@@ -3,19 +3,35 @@ import { getAllActivitiesForUser, createActivityForUser, deleteActivityById} fro
 import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { AppError } from "../utils/AppError.js";
 
-const getAllActivities = catchAsyncError(async (req, res) => {
-    const userId = req.params.id;
-    //check user exist
-    const features = new ApiFeatures(getAllActivitiesForUser(userId), req.query)
-        .paginate()
-        .sort()
-        .fields()
-        .filter()
-        .search();    
-    const result = features.mongooseQuery;
-    // const activityList = await getAllActivitiesForUser(userId);
-    return res.status(200).send(result);
-})
+const getAllActivities = catchAsyncError(async (req, res, next) => {
+  const userId = req.params.id;
+
+  const countQuery = new ApiFeatures(getAllActivitiesForUser(userId), req.query)
+    .filter()
+    .search();
+
+  const totalItems = await countQuery.mongooseQuery.countDocuments();
+
+  const apifeatures = new ApiFeatures(getAllActivitiesForUser(userId), req.query)
+    .filter()
+    .search()
+    .sort()
+    .fields()
+    .paginate();
+
+  const result = await apifeatures.mongooseQuery;
+
+  const totalPages = Math.ceil(totalItems / apifeatures.limit);
+
+  return res.status(200).json({
+    message: "success",
+    page: apifeatures.page,
+    totalItems,
+    totalPages,
+    result,
+  });
+});
+
 
 const postActivity = catchAsyncError(async (req, res) => {
     const userId = req.params.id;
