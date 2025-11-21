@@ -93,8 +93,11 @@ const updateUser = catchAsyncError(async (req, res, next) => {
     }
   }
 
-  if (req.body.image) {
-    result.image = req.file.filename;
+  // console.log(req.file);
+  // console.log(req.body);
+  
+  if (req.file?.filename) {
+    result.image = req.file?.filename;
   }
 
   await result.save();
