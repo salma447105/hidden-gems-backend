@@ -54,7 +54,7 @@ const getAllCategories = catchAsyncError(async (req, res, next) => {
     .fields()
     .paginate();
 
-  const result = await apifeatures.mongooseQuery.populate('createdBy');
+  const result = await apifeatures.mongooseQuery.populate('createdBy', 'firstName lastName email');
 
   const totalPages = Math.ceil(totalItems / apifeatures.limit);
 console.log(result);

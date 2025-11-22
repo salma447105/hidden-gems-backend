@@ -18,7 +18,7 @@ const getAllGems = catchAsyncError(async (req, res, next) => {
     .fields()
     .paginate();
 
-  const result = await apifeatures.mongooseQuery;
+  const result = await apifeatures.mongooseQuery.populate('createdBy', 'firstName lastName email');
 
   const totalPages = Math.ceil(totalItems / apifeatures.limit);
 
