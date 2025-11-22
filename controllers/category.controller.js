@@ -67,20 +67,30 @@ const getAllCategories = catchAsyncError(async (req, res, next) => {
   });
 });
 
+const updateCategory = catchAsyncError(async (req, res, next) => {
+  const { id } = req.params;
 
-const updateCategory = catchAsyncError(
-    async (req, res, next) => {
-        const { id } = req.params
-        if(req.body.categoryImage){
-            req.body.categoryImage=req.file.filename
-        }
-        let result = await categoryModel.findByIdAndUpdate(id, req.body, { new: true })
+  let updateData = {
+    categoryName: req.body.categoryName,
+  };
 
-        !result && next(new AppError(`category not found`, 404))
-        result && res.status(200).json({ message: "success", result })
-    }
-)
+  if (req.file?.filename) {
+    updateData.categoryImage = req.file.filename;
+  }
 
+  let result = await categoryModel.findByIdAndUpdate(
+    id,
+    updateData,
+    { new: true }
+  );
+
+  if (!result) return next(new AppError("Category not found", 404));
+
+  return res.status(200).json({
+    message: "success",
+    result,
+  });
+});
 
 
 const deleteCategory = catchAsyncError(
