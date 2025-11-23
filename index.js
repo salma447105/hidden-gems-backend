@@ -41,9 +41,15 @@ app.use("/gems", gemRouter);
 
 app.use(globalMiddleWare);
 
-// Mongo connection
-mongoose.connect(process.env.DB_URL)
-  .then(() => console.log("DB Connected"))
-  .catch((err) => console.error(" DB Connection Failed:", err));
+mongoose
+  .connect(DB_URI)
+  .then(() => console.log(`DB Connected`))
+  .catch((err) => console.error("❌ DB Connection Failed:", err));
+
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
+  });
+}
 
 export default app;
