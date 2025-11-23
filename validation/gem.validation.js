@@ -10,6 +10,7 @@ export const gemSchema = Joi.object({
   discountPremium: Joi.number().min(0).max(100).optional(),
   status: Joi.string().valid("pending", "rejected", "accepted").optional(),
   avgRating: Joi.number().min(0).max(5).optional(),
+  isSubscribed: Joi.boolean().optional(),
 });
 
 
@@ -23,5 +24,6 @@ export const gemUpdateSchema = Joi.object({
   discountPremium: Joi.number().min(0).max(100).optional(),
   status: Joi.string().valid("pending", "rejected", "accepted").optional(),
   avgRating: Joi.number().min(0).max(5).optional(),
+  isSubscribed: Joi.boolean().optional(),
 });
 
