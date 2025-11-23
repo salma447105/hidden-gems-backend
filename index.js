@@ -41,15 +41,15 @@ app.use("/gems", gemRouter);
 
 app.use(globalMiddleWare);
 
-mongoose
-  .connect(DB_URI)
-  .then(() => console.log(`DB Connected`))
-  .catch((err) => console.error("❌ DB Connection Failed:", err));
+// Mongo connection
+mongoose.connect(process.env.DB_URL)
+  .then(() => console.log("DB Connected"))
+  .catch((err) => console.error(" DB Connection Failed:", err));
 
+// Run locally ONLY
 if (!process.env.VERCEL) {
-  app.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => console.log(`Local server running on port ${port}`));
 }
 
 export default app;
