@@ -230,15 +230,25 @@ export const createOnlineSession = async (request, response) => {
     }
   }
 
-  if (event.type === "checkout.session.completed") {
-    console.log("Customer started subscription");
-     await userModel.findByIdAndUpdate(
-    event.data.object.client_reference_id,
-    { role: "owner" }
+if (event.type === "checkout.session.completed") {
+  const userId = event.data.object.client_reference_id;
+  console.log("Updating role for userId:", userId);
+
+  const user = await userModel.findByIdAndUpdate(
+    userId,
+    { role: "owner" },
+    { new: true }
   );
 
-  return response.status(200).send("ok");
+  if (!user) {
+    console.log("User not found for role update!");
+  } else {
+    console.log("User role updated to:", user.role);
   }
+
+  return response.status(200).send("ok");
+}
+
 
   if (event.type === "invoice.payment_succeeded") {
     console.log("Monthly payment success");
