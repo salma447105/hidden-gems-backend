@@ -46,10 +46,4 @@ mongoose.connect(process.env.DB_URL)
   .then(() => console.log("DB Connected"))
   .catch((err) => console.error(" DB Connection Failed:", err));
 
-// Run locally ONLY
-if (!process.env.VERCEL) {
-  const port = process.env.PORT || 3000;
-  app.listen(port, () => console.log(`Local server running on port ${port}`));
-}
-
 export default app;
