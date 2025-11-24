@@ -185,30 +185,86 @@ const allowedTo = (...roles) => {
   });
 };
 
-export const createCheckoutSession = catchAsyncError(async (req, res, next) => {
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+// export const createCheckoutSession = catchAsyncError(async (req, res, next) => {
+//   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+//   const session = await stripe.checkout.sessions.create({
+//     mode: "subscription",
+//     line_items: [
+//       {
+//         price: "price_1SWOZ7P3E6MDFeyI6Dmy7WZU",
+//         quantity: 1,
+//       },
+//     ],
+//     customer_email: req.user.email,
+//     client_reference_id: req.user._id.toString(),
+
+//     success_url: `${frontendUrl}/success`,
+//     cancel_url: `${frontendUrl}/cancel`,
+//   });
+
+//   res.status(200).json({ message: "success", session });
+// });
+
+export const checkoutOwner = async (req, res) => {
+    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
     line_items: [
-      {
-        price: "price_1SWOZ7P3E6MDFeyI6Dmy7WZU",
-        quantity: 1,
-      },
+      { price: process.env.OWNER_PRICE_ID, quantity: 1 }
     ],
     customer_email: req.user.email,
     client_reference_id: req.user._id.toString(),
-
+    metadata: {
+      type: "owner"
+    },
     success_url: `${frontendUrl}/success`,
     cancel_url: `${frontendUrl}/cancel`,
   });
 
-  res.status(200).json({ message: "success", session });
-});
+  res.json({ session });
+};
+export const checkoutGold = async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    line_items: [
+      { price: process.env.GOLD_PRICE_ID, quantity: 1 }
+    ],
+    customer_email: req.user.email,
+    client_reference_id: req.user._id.toString(),
+    metadata: {
+      type: "user",
+      plan: "gold"
+    },
+    success_url: "...",
+    cancel_url: "..."
+  });
+
+  res.json({ session });
+};
+export const checkoutPlatinum = async (req, res) => {
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    line_items: [
+      { price: process.env.PLATINUM_PRICE_ID, quantity: 1 }
+    ],
+    customer_email: req.user.email,
+    client_reference_id: req.user._id.toString(),
+    metadata: {
+      type: "user",
+      plan: "platinum"
+    },
+    success_url: "...",
+    cancel_url: "..."
+  });
+
+  res.json({ session });
+};
+
+
+
 
 export const createOnlineSession = async (request, response) => {
-  console.log("🔑 WEBHOOK_SECRET exists:", !!process.env.WEBHOOK_SECRET);
-  console.log("🔑 STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
-  console.log("🔑 Body is Buffer:", Buffer.isBuffer(request.body));
 
   let event;
 
@@ -236,19 +292,28 @@ export const createOnlineSession = async (request, response) => {
   }
 
 if (event.type === "checkout.session.completed") {
-  const userId = event.data.object.client_reference_id;
-  console.log("Updating role for userId:", userId);
+  
+  const session = event.data.object;
+  const userId = session.client_reference_id;
+  const type = session.metadata.type;
+  const plan = session.metadata.plan;
 
-  const user = await userModel.findByIdAndUpdate(
-    userId,
-    { role: "owner" },
-    { new: true }
-  );
+  if (type === "owner") {
+    await userModel.findByIdAndUpdate(userId, {
+      role: "owner"
+    });
+  }
 
-  if (!user) {
-    console.log("User not found for role update!");
-  } else {
-    console.log("User role updated to:", user.role);
+  if (type === "user" && plan === "gold") {
+    await userModel.findByIdAndUpdate(userId, {
+      subscription: "gold"
+    });
+  }
+
+  if (type === "user" && plan === "platinum") {
+    await userModel.findByIdAndUpdate(userId, {
+      subscription: "platinum"
+    });
   }
 
   return response.status(200).send("ok");
