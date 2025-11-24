@@ -38,6 +38,7 @@ app.use("/review", reviewRouter);
 app.use("/users", userRouter);
 app.use("/categories", categoryRouter);
 app.use("/gems", gemRouter);
+app.use('/vouchers', voucherRouter);
 
 app.use(globalMiddleWare);
 
