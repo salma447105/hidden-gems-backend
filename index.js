@@ -11,6 +11,7 @@ import activityRouter from "./route/activity.route.js";
 import reviewRouter from "./route/review.routes.js";
 import gemRouter from "./route/gem.route.js";
 import { createOnlineSession } from "./controllers/auth.controller.js";
+import ratingRouter from "./route/rating.route.js";
 dotenv.config();
 
 const app = express();
@@ -37,6 +38,7 @@ app.use("/review", reviewRouter);
 app.use("/users", userRouter);
 app.use("/categories", categoryRouter);
 app.use("/gems", gemRouter);
+app.use("/ratings", ratingRouter);
 
 app.use(globalMiddleWare);
 

@@ -18,7 +18,8 @@ import { gemModel } from "../models/gem.js";
 
 
  const getGem = async (id) => {
-    return await gemModel.findById(id);
+    return await gemModel.findById(id).populate('createdBy', 'firstName lastName email').populate('category', 'categoryName categoryImage');
+;
 }
 
 const createTheGem = async (gem) => { 
