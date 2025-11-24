@@ -1,5 +1,4 @@
 import mongoose from "mongoose";
-// import { v4 as uuid } from "uuid";
 import { nanoid } from "nanoid";
 
 const userSchema = new mongoose.Schema({
@@ -33,7 +32,6 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-
   image: {
     type: String,
   },
@@ -46,22 +44,34 @@ const userSchema = new mongoose.Schema({
     enum: ["free", "platinum", "gold"],
     default: "free",
   },
-    passwordChangedAt: Date,
-
+  passwordChangedAt: Date,
   code: {
     type: String,
-    // default:()=>nanoid(10),
-    // unique: true,
   },
-  // qrcode: {
-
-  // }
-
   googleId: {
-  type: String,
-  unique: true,
-  sparse: true  
-}
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  stripeCustomerId: {
+    type: String,
+    default: null,
+  },
+
+  subscriptionStatus: {
+    type: String,
+    enum: ["active", "canceled", "past_due", "incomplete"],
+    default: "active",
+  },
+  lastPaymentDate: {
+    type: Date,
+  },
+  subscriptionEndDate: {
+    type: Date,
+  },
+  stripeSubscriptionId: {
+    type: String,
+  },
 }, { timestamps: true });
 
 export const userModel = mongoose.model("user", userSchema);

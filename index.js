@@ -16,16 +16,16 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use(cors({
+  origin: (origin, callback) => callback(null, origin), 
+  credentials: true,
+}));
 
 app.post(
   "/webhook",
   express.raw({ type: "application/json" }),
   createOnlineSession
 );
-app.use(cors({
-  origin: (origin, callback) => callback(null, origin), 
-  credentials: true,
-}));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/uploads', express.static('uploads'));
