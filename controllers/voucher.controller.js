@@ -1,9 +1,9 @@
-import { catchAsyncError } from "../middleware/catchAsyncError";
-import { getUserById } from "../repository/user.repo";
-import { AppError } from "../utils/AppError";
+import { catchAsyncError } from "../middleware/catchAsyncError.js";
+import { getUserById } from "../repository/user.repo.js";
+import { AppError } from "../utils/AppError.js";
 import * as voucherRepository from "../repository/voucher.repository.js";
 import * as transactionVoucherRepository from "../repository/transactionVocuher.repository.js";
-import voucherTypes from "../utils/voucherTypes";
+import voucherTypes from "../utils/voucherTypes.js";
 import QRCode  from "qrcode"
 
 

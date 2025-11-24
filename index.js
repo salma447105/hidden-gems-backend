@@ -9,6 +9,7 @@ import userRouter from "./route/user.route.js";
 import categoryRouter from "./route/category.router.js";
 import activityRouter from "./route/activity.route.js";
 import reviewRouter from "./route/review.routes.js";
+import voucherRouter from "./route/voucher.route.js";
 import gemRouter from "./route/gem.route.js";
 import { createOnlineSession } from "./controllers/auth.controller.js";
 dotenv.config();

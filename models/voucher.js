@@ -1,10 +1,8 @@
-import { number } from "joi";
 import mongoose, { Mongoose } from "mongoose";
-import { type } from "os";
 
 const voucherSchema = new mongoose.Schema({
     code: {type: String, required: true},
-    discount: {type: number, required: true},
+    discount: {type: Number, required: true},
     expiryDate: {type: Date, required: true},
     gemId: {type: mongoose.Types.ObjectId, ref: "Gem", required: true},
     createdAt: {type: Date, default: Date.now, required: true},

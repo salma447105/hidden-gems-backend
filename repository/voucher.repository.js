@@ -1,4 +1,4 @@
-import voucherModel from "../models/voucher";
+import voucherModel from "../models/voucher.js";
 
 export const createVoucher = async (voucherData) => {
     return await voucherModel.create(voucherData);
