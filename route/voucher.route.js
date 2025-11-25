@@ -1,7 +1,7 @@
 import express from 'express';
 import { allowedTo, protectedRoutes } from '../controllers/auth.controller.js';
-import { createVoucherForUser, redeemVoucher } from '../controllers/voucher.controller.js';
-import { getVoucherByCode } from '../repository/voucher.repository.js';
+import { createVoucherForUser, getVoucherByCode, redeemVoucher } from '../controllers/voucher.controller.js';
+
 const router = express.Router();
 
 router.post('/create/:gemId', protectedRoutes, createVoucherForUser);

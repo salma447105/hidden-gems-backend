@@ -1,11 +1,11 @@
 const voucherTypes = {
     PLATINUM: {
-        prefix: "PLATINUM-",
+        prefix: "platinum",
         discount: 20,
         expiryMonths: 1
     },
     GOLD: {
-        prefix: "GOLD-",
+        prefix: "gold",
         discount: 10,
         expiryMonths: 2
     }
