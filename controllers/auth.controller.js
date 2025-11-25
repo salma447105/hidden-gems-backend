@@ -5,10 +5,9 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { sendEmail } from "../emails/user.email.js";
 import Stripe from "stripe";
-import { OAuth2Client } from 'google-auth-library';
+import { OAuth2Client } from "google-auth-library";
 
 const googleClient = new OAuth2Client(process.env.CLIENT_ID);
-
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -185,31 +184,81 @@ const allowedTo = (...roles) => {
   });
 };
 
-export const createCheckoutSession = catchAsyncError(async (req, res, next) => {
+// export const createCheckoutSession = catchAsyncError(async (req, res, next) => {
+//   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+//   const session = await stripe.checkout.sessions.create({
+//     mode: "subscription",
+//     line_items: [
+//       {
+//         price: "price_1SWOZ7P3E6MDFeyI6Dmy7WZU",
+//         quantity: 1,
+//       },
+//     ],
+//     customer_email: req.user.email,
+//     client_reference_id: req.user._id.toString(),
+
+//     success_url: `${frontendUrl}/success`,
+//     cancel_url: `${frontendUrl}/cancel`,
+//   });
+
+//   res.status(200).json({ message: "success", session });
+// });
+
+export const checkoutOwner = async (req, res) => {
   const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
-    line_items: [
-      {
-        price: "price_1SWOZ7P3E6MDFeyI6Dmy7WZU",
-        quantity: 1,
-      },
-    ],
+    line_items: [{ price: process.env.OWNER_PRICE_ID, quantity: 1 }],
     customer_email: req.user.email,
     client_reference_id: req.user._id.toString(),
-
+    metadata: {
+      type: "owner",
+    },
     success_url: `${frontendUrl}/success`,
     cancel_url: `${frontendUrl}/cancel`,
   });
 
-  res.status(200).json({ message: "success", session });
-});
+  res.json({ session });
+};
+export const checkoutGold = async (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    line_items: [{ price: process.env.GOLD_PRICE_ID, quantity: 1 }],
+    customer_email: req.user.email,
+    client_reference_id: req.user._id.toString(),
+    metadata: {
+      type: "user",
+      plan: "gold",
+    },
+    success_url: `${frontendUrl}/success`,
+    cancel_url: `${frontendUrl}/cancel`,
+  });
+
+  res.json({ session });
+};
+export const checkoutPlatinum = async (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "subscription",
+    line_items: [{ price: process.env.PLATINUM_PRICE_ID, quantity: 1 }],
+    customer_email: req.user.email,
+    client_reference_id: req.user._id.toString(),
+    metadata: {
+      type: "user",
+      plan: "platinum",
+    },
+    success_url: `${frontendUrl}/success`,
+    cancel_url: `${frontendUrl}/cancel`,
+  });
+
+  res.json({ session });
+};
 
 export const createOnlineSession = async (request, response) => {
-  console.log("🔑 WEBHOOK_SECRET exists:", !!process.env.WEBHOOK_SECRET);
-  console.log("🔑 STRIPE_SECRET_KEY exists:", !!process.env.STRIPE_SECRET_KEY);
-  console.log("🔑 Body is Buffer:", Buffer.isBuffer(request.body));
-
   let event;
 
   if (process.env.WEBHOOK_SECRET) {
@@ -235,43 +284,219 @@ export const createOnlineSession = async (request, response) => {
     }
   }
 
-if (event.type === "checkout.session.completed") {
-  const userId = event.data.object.client_reference_id;
-  console.log("Updating role for userId:", userId);
+  // 1. عند اكتمال الدفع لأول مرة
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    const userId = session.client_reference_id;
+    const type = session.metadata.type;
+    const plan = session.metadata.plan;
+    const stripeCustomerId = session.customer;
+    const stripeSubscriptionId = session.subscription; // ✅ مهم جداً
 
-  const user = await userModel.findByIdAndUpdate(
-    userId,
-    { role: "owner" },
-    { new: true }
-  );
+    if (type === "owner") {
+      await userModel.findByIdAndUpdate(userId, {
+        role: "owner",
+        stripeCustomerId: stripeCustomerId,
+        stripeSubscriptionId: stripeSubscriptionId,
+        subscriptionStatus: "active",
+        lastPaymentDate: new Date(),
+      });
+    }
 
-  if (!user) {
-    console.log("User not found for role update!");
-  } else {
-    console.log("User role updated to:", user.role);
+    if (type === "user" && plan === "gold") {
+      await userModel.findByIdAndUpdate(userId, {
+        subscription: "gold",
+        stripeCustomerId: stripeCustomerId,
+        stripeSubscriptionId: stripeSubscriptionId,
+        subscriptionStatus: "active",
+        lastPaymentDate: new Date(),
+      });
+    }
+
+    if (type === "user" && plan === "platinum") {
+      await userModel.findByIdAndUpdate(userId, {
+        subscription: "platinum",
+        stripeCustomerId: stripeCustomerId,
+        stripeSubscriptionId: stripeSubscriptionId,
+        subscriptionStatus: "active",
+        lastPaymentDate: new Date(),
+      });
+    }
+
+    console.log(`✅ Subscription activated for user: ${userId}`);
+    return response.status(200).send("ok");
   }
 
-  return response.status(200).send("ok");
-}
-
-
+  // 2. نجاح الدفع الشهري
   if (event.type === "invoice.payment_succeeded") {
-    console.log("Monthly payment success");
-    // هنا تعمل Activate Subscription للعميل في DB
+    const invoice = event.data.object;
+    const stripeCustomerId = invoice.customer;
+
+    await userModel.findOneAndUpdate(
+      { stripeCustomerId },
+      { 
+        subscriptionStatus: "active",
+        lastPaymentDate: new Date()
+      }
+    );
+
+    console.log(`✅ Monthly payment succeeded for customer: ${stripeCustomerId}`);
+    return response.status(200).send("ok");
   }
 
+  // 3. فشل الدفع الشهري
   if (event.type === "invoice.payment_failed") {
-    console.log("Monthly payment failed");
-    // Disable Account / Send email…etc
+    const invoice = event.data.object;
+    const stripeCustomerId = invoice.customer;
+
+    await userModel.findOneAndUpdate(
+      { stripeCustomerId },
+      { subscriptionStatus: "past_due" }
+    );
+
+    // ممكن تبعت إيميل تحذير للعميل
+    const user = await userModel.findOne({ stripeCustomerId });
+    if (user) {
+      await sendEmail(
+        user.email,
+        "Payment Failed - Action Required",
+        `<p>Your payment failed. Please update your payment method to continue your subscription.</p>`
+      );
+    }
+
+    console.log(`⚠️ Payment failed for customer: ${stripeCustomerId}`);
+    return response.status(200).send("ok");
   }
 
+  // 4. إلغاء الاشتراك
   if (event.type === "customer.subscription.deleted") {
-    console.log("Subscription canceled");
-    // Disable access in your DB
+    const subscription = event.data.object;
+    const stripeCustomerId = subscription.customer;
+
+    const user = await userModel.findOne({ stripeCustomerId });
+    
+    if (user) {
+      // لو كان owner يرجع user عادي
+      if (user.role === "owner") {
+        await userModel.findOneAndUpdate(
+          { stripeCustomerId },
+          { 
+            role: "user",
+            subscription: "free",
+            subscriptionStatus: "canceled"
+          }
+        );
+      } else {
+        // لو user عادي يرجع free
+        await userModel.findOneAndUpdate(
+          { stripeCustomerId },
+          { 
+            subscription: "free",
+            subscriptionStatus: "canceled"
+          }
+        );
+      }
+
+      await sendEmail(
+        user.email,
+        "Subscription Canceled",
+        `<p>Your subscription has been canceled. We're sorry to see you go!</p>`
+      );
+    }
+
+    console.log(`❌ Subscription canceled for customer: ${stripeCustomerId}`);
+    return response.status(200).send("ok");
   }
+
+  // 5. تحديث الاشتراك (Upgrade/Downgrade)
+  if (event.type === "customer.subscription.updated") {
+    const subscription = event.data.object;
+    const stripeCustomerId = subscription.customer;
+    const newPlan = subscription.items.data[0].price.id;
+
+    let subscriptionType = "free";
+    let userRole = "user";
+
+    // حدد نوع الاشتراك بناءً على الـ price ID
+    if (newPlan === process.env.OWNER_PRICE_ID) {
+      userRole = "owner";
+    } else if (newPlan === process.env.GOLD_PRICE_ID) {
+      subscriptionType = "gold";
+    } else if (newPlan === process.env.PLATINUM_PRICE_ID) {
+      subscriptionType = "platinum";
+    }
+
+    if (userRole === "owner") {
+      await userModel.findOneAndUpdate(
+        { stripeCustomerId },
+        { 
+          role: "owner",
+          subscriptionStatus: subscription.status
+        }
+      );
+    } else {
+      await userModel.findOneAndUpdate(
+        { stripeCustomerId },
+        { 
+          subscription: subscriptionType,
+          subscriptionStatus: subscription.status
+        }
+      );
+    }
+
+    console.log(`🔄 Subscription updated for customer: ${stripeCustomerId}`);
+    return response.status(200).send("ok");
+  }
+
+  // 6. عند توقف محاولات الدفع بعد عدة فشل
+  if (event.type === "invoice.payment_action_required") {
+    const invoice = event.data.object;
+    const stripeCustomerId = invoice.customer;
+
+    await userModel.findOneAndUpdate(
+      { stripeCustomerId },
+      { subscriptionStatus: "incomplete" }
+    );
+
+    const user = await userModel.findOne({ stripeCustomerId });
+    if (user) {
+      await sendEmail(
+        user.email,
+        "Payment Action Required",
+        `<p>Your payment requires additional authentication. Please complete the payment process.</p>`
+      );
+    }
+
+    console.log(`⚠️ Payment action required for customer: ${stripeCustomerId}`);
+    return response.status(200).send("ok");
+  }
+
+  // 7. عند استرجاع الاشتراك (Reactivation)
+  if (event.type === "customer.subscription.resumed") {
+    const subscription = event.data.object;
+    const stripeCustomerId = subscription.customer;
+
+    await userModel.findOneAndUpdate(
+      { stripeCustomerId },
+      { subscriptionStatus: "active" }
+    );
+
+    console.log(`✅ Subscription resumed for customer: ${stripeCustomerId}`);
+    return response.status(200).send("ok");
+  }
+
+  response.status(200).send("ok");
 };
 
+export const checkoutChange = async (req, res) => {
+  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
 
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: req.user.stripeCustomerId,
+    return_url: `${frontendUrl}/account`,
+  });
+  res.json({ url: portalSession.url });
+};
 
 const googleLogin = catchAsyncError(async (req, res, next) => {
   const { token } = req.body;
@@ -279,7 +504,7 @@ const googleLogin = catchAsyncError(async (req, res, next) => {
   try {
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
-      audience: process.env.CLIENT_ID
+      audience: process.env.CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -290,12 +515,15 @@ const googleLogin = catchAsyncError(async (req, res, next) => {
     if (!user) {
       user = new userModel({
         email,
-        firstName: name.split(' ')[0] || name,
-        lastName: name.split(' ')[1] || '',
+        firstName: name.split(" ")[0] || name,
+        lastName: name.split(" ")[1] || "",
         googleId,
         image: picture,
-        verified: true, 
-        password: bcrypt.hashSync(Math.random().toString(36), Number(process.env.SALT_ROUNDS)) 
+        verified: true,
+        password: bcrypt.hashSync(
+          Math.random().toString(36),
+          Number(process.env.SALT_ROUNDS)
+        ),
       });
       await user.save();
     } else if (!user.googleId) {
@@ -315,7 +543,7 @@ const googleLogin = catchAsyncError(async (req, res, next) => {
         sameSite: "none",
       })
       .status(200)
-      .json({ 
+      .json({
         message: "Login successful",
         user: {
           id: user._id,
@@ -323,13 +551,12 @@ const googleLogin = catchAsyncError(async (req, res, next) => {
           firstName: user.firstName,
           lastName: user.lastName,
           image: user.image,
-          role: user.role
-        }
+          role: user.role,
+        },
       });
-
   } catch (error) {
-    console.error('Google Login Error:', error);
-    return next(new AppError('Invalid Google token', 401));
+    console.error("Google Login Error:", error);
+    return next(new AppError("Invalid Google token", 401));
   }
 });
 export {
@@ -342,6 +569,5 @@ export {
   forgetPassword,
   resetPassword,
   getCurrentUser,
-    googleLogin  
-
+  googleLogin,
 };

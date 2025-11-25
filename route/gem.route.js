@@ -22,7 +22,7 @@ gemRouter.route("/")
 gemRouter
   .route("/:id")
   .get(getGemById)
-  .delete(protectedRoutes, allowedTo("admin, owner"), deleteGem)
+  .delete(protectedRoutes, deleteGem)
   .put(
     protectedRoutes,
     allowedTo("admin"),

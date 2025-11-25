@@ -36,7 +36,11 @@ const result = await apifeatures.mongooseQuery
 
 const getGemById = catchAsyncError(async (req, res, next) => {
   const { id } = req.params;
-  let result = await getGem(id);
+  // console.log(id);
+ 
+  let result = await getGem(id)
+  //
+  console.log(result);
   if (!result) return next(new AppError(`Gem not found`, 404));
   res.status(200).json({ message: "success", result });
 });
@@ -49,11 +53,12 @@ const createGem = catchAsyncError(async (req, res, next) => {
   if (req.user.role === "admin") {
     status = "accepted";
   }
-// console.log(req.files?.images);
+  // console.log("req.body:", req.files);
+  // console.log(req.files?.images);
 
   let gemData = {
     ...req.body,
-    images: req.files.images.map(obj => obj.filename),
+    images: req.files?.images?.map(obj => obj.filename),
     status: status,
     createdBy: req.user._id,
   };

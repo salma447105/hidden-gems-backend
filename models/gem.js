@@ -11,7 +11,8 @@ const gemSchema = new mongoose.Schema({
     default: "pending",
   },
   discount: { type: Number, default: 0 },
-  discountPremium: { type: Number, default: 0 },
+  discountGold: { type: Number, default: 0 },
+  discountPlatinum: { type: Number, default: 0 },
   avgRating: { type: Number, default: 0 },
   category: {
     type: mongoose.Schema.Types.ObjectId,

@@ -17,7 +17,10 @@ authRouter.route('/resetPassword').post(authController.resetPassword)
 
 
 
-authRouter.route('/ownerRegister').post(authController.protectedRoutes,authController.createCheckoutSession)
+authRouter.route('/checkout/owner').post(authController.protectedRoutes,authController.checkoutOwner)
+authRouter.route('/checkout/gold').post(authController.protectedRoutes,authController.checkoutGold)
+authRouter.route('/checkout/platinum').post(authController.protectedRoutes,authController.checkoutPlatinum)
+authRouter.route('/checkout/change').post(authController.protectedRoutes,authController.checkoutChange)
 authRouter.route('/google').post(authController.googleLogin)
 
 
