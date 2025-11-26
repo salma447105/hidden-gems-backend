@@ -30,6 +30,14 @@ export const signUpSchema = Joi.object({
         "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
       "string.empty": "Password is required.",
     }),
+
+  role: Joi.string().valid("user", "admin",'owner').default("user"),
+
+  subscription: Joi.string()
+    .valid("free", "gold", "platinum")
+    .default("free"),
+
+  verified: Joi.boolean().default(false),
 });
 
 export const signInSchema = Joi.object({
