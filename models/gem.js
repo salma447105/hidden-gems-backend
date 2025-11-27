@@ -28,7 +28,7 @@ const gemSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  embedding: {
+  embeddings: {
     type: [Number],    
     required: false,  
     default: []

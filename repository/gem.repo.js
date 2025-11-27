@@ -22,17 +22,12 @@ const getGem = async (id) => {
     .populate("category", "categoryName categoryImage");
 };
 
-const getGemsByUserId = async (userId) => {
-    return await gemModel
-        .find({ createdBy: userId })
-        .populate("createdBy", "firstName lastName email")
-        .populate("category", "categoryName categoryImage");
+const getGemsByUserId =  (userId) => {
+    return  gemModel.find({ createdBy: userId });
 };
 
-const getGemsByCategoryId = async (categoryId) => {
-    return await gemModel.find({ category: categoryId })
-        .populate("createdBy", "firstName lastName email")
-        .populate("category", "categoryName categoryImage");
+const getGemsByCategoryId =   (categoryId) => {
+    return  gemModel.find({ category: categoryId });
 };
 
 const createTheGem = async (gem) => {
@@ -40,7 +35,10 @@ const createTheGem = async (gem) => {
 };
 
 const updateTheGem = async (id, updatedFields) => {
-  return await gemModel.findByIdAndUpdate(id, updatedFields, { new: true });
+    return await gemModel
+      .findByIdAndUpdate(id, updatedFields, { new: true })
+      .populate("createdBy", "firstName lastName email") 
+      .populate("category", "categoryName categoryImage");
 };
 
 const deleteTheGem = async (id) => {
