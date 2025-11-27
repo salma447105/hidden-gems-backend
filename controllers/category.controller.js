@@ -28,7 +28,7 @@ const createCategory = catchAsyncError(async (req, res, next) => {
 });
 
 const getCategory = catchAsyncError(async (req, res, next) => {
-  let result = await categoryModel.findById(req.params.id);
+  let result = await categoryModel.findById(req.params.id).populate('createdBy', 'firstName lastName email');
 
   if (!result) return next(new AppError(`isExist not found`, 404));
 

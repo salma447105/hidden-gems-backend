@@ -85,7 +85,27 @@ const updateUser = catchAsyncError(async (req, res, next) => {
     return next(new AppError("You are not allowed to update this user", 403));
   }
 
-  const allowedUpdates = ["firstName", "lastName", "email", "phoneNumber", "image"];
+  if (req.body.email) {
+    const existingEmail = await userModel.findOne({
+      email: req.body.email,
+      _id: { $ne: id }, 
+    });
+
+    if (existingEmail) {
+      return next(new AppError("Email already exists", 400));
+    }
+  }
+
+  const allowedUpdates = [
+    "firstName",
+    "lastName",
+    "email",
+    "phoneNumber",
+    "image",
+    "role",
+    "subscription",
+    "verified"
+  ];
 
   for (let key of allowedUpdates) {
     if (req.body[key] !== undefined) {
@@ -93,11 +113,8 @@ const updateUser = catchAsyncError(async (req, res, next) => {
     }
   }
 
-  // console.log(req.file);
-  // console.log(req.body);
-  
   if (req.file?.filename) {
-    result.image = req.file?.filename;
+    result.image = req.file.filename;
   }
 
   await result.save();

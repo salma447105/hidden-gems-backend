@@ -51,18 +51,26 @@ paginate() {
     }
 
     //4-search
-    search() {
-        if (this.queryString.keyword) {
-            this.mongooseQuery.find({
-                $or: [
-                    { title: { $regex: this.queryString.keyword, $options: "i" } },
-                    { description: { $regex: this.queryString.keyword, $options: "i" } },
-                ]
-            })
-        }
-        return this
-    }
+//4-search
+search() {
+    if (this.queryString.keyword) {
+        this.mongooseQuery.find({
+            $or: [
+                { firstName: { $regex: this.queryString.keyword, $options: "i" } },
+                { lastName: { $regex: this.queryString.keyword, $options: "i" } },
+                { email: { $regex: this.queryString.keyword, $options: "i" } },
+                { phoneNumber: { $regex: this.queryString.keyword, $options: "i" } },
+                { categoryName: { $regex: this.queryString.keyword, $options: "i" } },
+                
+                { name: { $regex: this.queryString.keyword, $options: "i" } },
+                { gemLocation: { $regex: this.queryString.keyword, $options: "i" } },
+                
 
+            ]
+        })
+    }
+    return this
+}
 
     //5-select fields
     fields() {
