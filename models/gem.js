@@ -27,6 +27,11 @@ const gemSchema = new mongoose.Schema({
   isSubscribed: {
     type: Boolean,
     default: false
+  },
+  embeddings: {
+    type: [Number],    
+    required: false,  
+    default: []
   }
 });
 
