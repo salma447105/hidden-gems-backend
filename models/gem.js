@@ -33,6 +33,8 @@ const gemSchema = new mongoose.Schema({
     required: false,  
     default: []
   }
-});
+},
+  { timestamps: true }
+);
 
 export const gemModel = mongoose.model("gem", gemSchema);

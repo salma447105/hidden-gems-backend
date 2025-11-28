@@ -15,7 +15,7 @@ import { protectedRoutes } from "../controllers/auth.controller.js";
 
 const ratingRouter = express.Router();
 
-ratingRouter.use(protectedRoutes);
+// ratingRouter.use(protectedRoutes);
 
 ratingRouter.route("/")
     .post(validation(ratingSchema), createRating);

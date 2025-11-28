@@ -15,16 +15,19 @@ export const sendEmail = async (to, subject, html) => {
       },
     });
 
+    await transporter.verify();
+    console.log("Email transporter verified successfully");
+
     const info = await transporter.sendMail({
-      from: `<${process.env.EMAIL_USER}>`,
+      from: `<Gemsy Support ${process.env.EMAIL_USER}>`,
       to,
       subject,
       html,
     });
-
+    console.log("Email sent successfully:", info.messageId);
     return info;
   } catch (error) {
-    console.error("Error ", error);
+    console.error("Email sending error ", error);
     throw error;
   }
 };

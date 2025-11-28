@@ -19,7 +19,8 @@ const getGem = async (id) => {
   return await gemModel
     .findById(id)
     .populate("createdBy", "firstName lastName email")
-    .populate("category", "categoryName categoryImage");
+    .populate("category", "categoryName categoryImage")
+    .sort({ createdAt: -1 });
 };
 
 const getGemsByUserId =  (userId) => {
