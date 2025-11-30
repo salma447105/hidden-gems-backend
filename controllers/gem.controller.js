@@ -49,7 +49,7 @@ const getGemById = catchAsyncError(async (req, res, next) => {
 
   let result = await getGem(id);
   //
-  console.log(result);
+  // console.log(result);
   if (!result) return next(new AppError(`Gem not found`, 404));
   res.status(200).json({ message: "success", result });
 });

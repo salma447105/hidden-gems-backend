@@ -56,7 +56,7 @@ const getAllReviewsByGemId = catchAsyncError(async (req, res, next) => {
     let result = await apifeatures.mongooseQuery;
     for(let review of result) {
        review.rating = await getRatingNumberByReviewId(review._id);
-       console.log(review.rating);
+      //  console.log(review.rating);
     }
     // const reviewsList = await getAllReviewsForGem(gemId);
     return res.status(200).send(result);

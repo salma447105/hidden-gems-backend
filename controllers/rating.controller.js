@@ -63,7 +63,7 @@ const getAllUserRatings = catchAsyncError(async (req, res, next) => {
 const getUserRatingForGem = catchAsyncError(async (req, res, next) => {
     const { id, gemId } = req.params;
     let rating = await getTheUserRatingForGem(id, gemId);
-    console.log("rating:", rating);
+    // console.log("rating:", rating);
     return res
       .status(200)
       .json({
@@ -76,7 +76,7 @@ const getUserRatingForGem = catchAsyncError(async (req, res, next) => {
 const getGemAvgRating = catchAsyncError(async (req, res, next) => {
     const { gemId } = req.params;
     let avgRatingData = await getTheGemAvgRating(gemId);
-    console.log("avgRatingData:", avgRatingData);
+    // console.log("avgRatingData:", avgRatingData);
 
 
     return res.status(200).json({
@@ -87,8 +87,8 @@ const getGemAvgRating = catchAsyncError(async (req, res, next) => {
 
 // mainly for User's Use 
 const createRating = catchAsyncError(async (req, res, next) => {
-  console.log("req.body:", req.body); 
-  console.log("req.user:", req.user);
+  // console.log("req.body:", req.body); 
+  // console.log("req.user:", req.user);
   
     
   let isExist = await getTheUserRatingForGem(req.user._id, req.body.gem);

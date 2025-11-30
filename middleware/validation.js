@@ -13,7 +13,7 @@ export const validation = (schema) => {
     let { error } = schema.validate(inputs, { abortEarly: false });
 
     if (error) {
-      console.log("error in joi validations", error);
+      // console.log("error in joi validations", error);
       let errors = error.details.map((e) => e.message);
 
       return res.status(400).json({ errors });
