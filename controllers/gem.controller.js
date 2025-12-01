@@ -183,7 +183,6 @@ const updateGem = catchAsyncError(async (req, res, next) => {
   let result = await getGem(id);
   if (!result) return next(new AppError(`Gem not found`, 404));
 
-  console.log(result.createdBy);
   
   if (
     req.user.role !== "admin" &&

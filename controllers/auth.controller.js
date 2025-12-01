@@ -547,6 +547,39 @@ export const checkoutChange = async (req, res) => {
   });
   res.json({ url: portalSession.url });
 };
+// في ملف الـ payment routes
+export const cancelOwnerSubscription = async (req, res) => {
+  try {
+    const user = await userModel.findById(req.user._id);
+
+    if (!user || !user.stripeSubscriptionId) {
+      return res.status(400).json({ 
+        message: "No active subscription found" 
+      });
+    }
+
+    // إلغاء الاشتراك من Stripe
+    await stripe.subscriptions.cancel(user.stripeSubscriptionId);
+
+    // تحديث بيانات المستخدم
+    await userModel.findByIdAndUpdate(req.user._id, {
+      role: "user",
+      subscription: "free",
+      subscriptionStatus: "canceled",
+      stripeSubscriptionId: null,
+    });
+
+    res.json({ 
+      message: "Subscription cancelled successfully" 
+    });
+
+  } catch (error) {
+    console.error("Error cancelling subscription:", error);
+    res.status(500).json({ 
+      message: "Failed to cancel subscription" 
+    });
+  }
+};
 
 const googleLogin = catchAsyncError(async (req, res, next) => {
   const { token } = req.body;

@@ -1,30 +1,47 @@
-
 import express from "express";
 import * as authController from "../controllers/auth.controller.js";
 import { validation } from "../middleware/validation.js";
 import { signInSchema, signUpSchema } from "../validation/auth.validation.js";
 import upload from "../middleware/fileUpload.js";
-const authRouter=express.Router();
+const authRouter = express.Router();
 
+authRouter
+  .route("/signUp")
+  .post(
+    upload.single("image"),
+    validation(signUpSchema),
+    authController.signUp
+  );
+authRouter
+  .route("/signIn")
+  .post(validation(signInSchema), authController.signIn);
+authRouter.route("/verify").post(authController.VerifyUser);
+authRouter
+  .route("/logout")
+  .post(authController.protectedRoutes, authController.logout);
+authRouter
+  .route("/me")
+  .get(authController.protectedRoutes, authController.getCurrentUser);
+authRouter.route("/forgetPassword").post(authController.forgetPassword);
+authRouter.route("/resetPassword").post(authController.resetPassword);
 
-authRouter.route('/signUp').post(upload.single("image")
-,validation(signUpSchema),authController.signUp)
-authRouter.route('/signIn').post(validation(signInSchema),authController.signIn)
-authRouter.route('/verify').post(authController.VerifyUser)
-authRouter.route('/logout').post(authController.protectedRoutes,authController.logout)
-authRouter.route('/me').get(authController.protectedRoutes,authController.getCurrentUser)
-authRouter.route('/forgetPassword').post(authController.forgetPassword)
-authRouter.route('/resetPassword').post(authController.resetPassword)
-
-
-
-authRouter.route('/checkout/owner').post(authController.protectedRoutes,authController.checkoutOwner)
-authRouter.route('/checkout/gold').post(authController.protectedRoutes,authController.checkoutGold)
-authRouter.route('/checkout/platinum').post(authController.protectedRoutes,authController.checkoutPlatinum)
-authRouter.route('/checkout/change').post(authController.protectedRoutes,authController.checkoutChange)
-authRouter.route('/google').post(authController.googleLogin)
-
-
-
+authRouter
+  .route("/checkout/owner")
+  .post(authController.protectedRoutes, authController.checkoutOwner);
+authRouter
+  .route("/checkout/gold")
+  .post(authController.protectedRoutes, authController.checkoutGold);
+authRouter
+  .route("/checkout/platinum")
+  .post(authController.protectedRoutes, authController.checkoutPlatinum);
+authRouter
+  .route("/checkout/change")
+  .post(authController.protectedRoutes, authController.checkoutChange);
+authRouter.post(
+  "/payment/cancel-owner-subscription",
+  authController.protectedRoutes,
+  authController.cancelOwnerSubscription
+);
+authRouter.route("/google").post(authController.googleLogin);
 
 export default authRouter;
