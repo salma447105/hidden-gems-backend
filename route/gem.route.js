@@ -40,7 +40,6 @@ gemRouter
   .put(
     protectedRoutes,
     uploadMultipleFiles(filedsArray),
-
     validation(gemUpdateSchema),
     updateGem
   );
