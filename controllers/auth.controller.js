@@ -57,10 +57,14 @@ const signIn = catchAsyncError(async (req, res, next) => {
   if (!user.verified)
     return next(new AppError(`Please verify your email first`, 403));
 
+  console.log("user", user);
+  
   let token = jwt.sign({ userInfo: user }, process.env.JWT_KEY, {
     expiresIn: "7d",
   });
 
+
+  
   res
     .cookie("token", token, {
       httpOnly: true,
@@ -171,6 +175,13 @@ const getCurrentUser = catchAsyncError(async (req, res, next) => {
       image: req.user.image,
       subscription: req.user.subscription,
       points: req.user.points,
+      googleId: req.user.googleId,
+      stripeCustomerId: req.user.stripeCustomerId,
+      subscriptionStatus: req.user.subscriptionStatus,
+      lastPaymentDate: req.user.lastPaymentDate,
+      subscriptionEndDate: req.user.subscriptionEndDate,
+      stripeSubscriptionId: req.user.stripeSubscriptionId,
+
     },
   });
 });
@@ -547,7 +558,6 @@ export const checkoutChange = async (req, res) => {
   });
   res.json({ url: portalSession.url });
 };
-// في ملف الـ payment routes
 export const cancelOwnerSubscription = async (req, res) => {
   try {
     const user = await userModel.findById(req.user._id);
@@ -558,10 +568,8 @@ export const cancelOwnerSubscription = async (req, res) => {
       });
     }
 
-    // إلغاء الاشتراك من Stripe
     await stripe.subscriptions.cancel(user.stripeSubscriptionId);
 
-    // تحديث بيانات المستخدم
     await userModel.findByIdAndUpdate(req.user._id, {
       role: "user",
       subscription: "free",
