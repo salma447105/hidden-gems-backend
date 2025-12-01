@@ -27,7 +27,7 @@ gemRouter
   .route("/")
   .post(
     protectedRoutes,
-      uploadMultipleFiles(filedsArray), 
+    uploadMultipleFiles(filedsArray),
     validation(gemSchema),
     createGem
   )
@@ -39,8 +39,7 @@ gemRouter
   .delete(protectedRoutes, deleteGem) //, allowedTo("admin")
   .put(
     protectedRoutes,
-    allowedTo("admin"),
-      uploadMultipleFiles(filedsArray), 
+    uploadMultipleFiles(filedsArray),
 
     validation(gemUpdateSchema),
     updateGem
