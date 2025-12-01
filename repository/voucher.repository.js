@@ -5,7 +5,7 @@ export const createVoucher = async (voucherData) => {
 }
 
 export const getVoucherByCode = async (code) => {
-    return await voucherModel.findOne({code: code});
+    return await voucherModel.findOne({code: code}).populate('gemId').populate('userId');
 }
 
 export const getVoucherByUserIdAndGemId = async (userId, gemId) => {
