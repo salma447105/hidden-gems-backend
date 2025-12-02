@@ -67,7 +67,8 @@ const getAllGemsForCategory = catchAsyncError(async (req, res, next) => {
   const apifeatures = new ApiFeatures(
     getGemsByCategoryId(categoryId),
     req.query
-   ).filter()
+  )
+    .filter()
     .search()
     .sort()
     .fields()
@@ -133,12 +134,10 @@ const changeGemStatus = catchAsyncError(async (req, res, next) => {
   }
 
   const updatedGem = await updateTheGem(gemId, { status });
-  res
-    .status(200)
-    .json({
-      message: `Gem status updated to ${status} successfully`,
-      result: updatedGem,
-    });
+  res.status(200).json({
+    message: `Gem status updated to ${status} successfully`,
+    result: updatedGem,
+  });
 });
 
 const createGem = catchAsyncError(async (req, res, next) => {
@@ -160,11 +159,11 @@ const createGem = catchAsyncError(async (req, res, next) => {
 
   let gemData = {
     ...req.body,
-    images: uploadedImages, 
+    images: uploadedImages,
     status: status,
     createdBy: req.user._id,
   };
-  
+
   let result = await createTheGem(gemData);
   result.embeddings = await createEmbeddings(result.description);
   await result.save();
@@ -183,7 +182,6 @@ const updateGem = catchAsyncError(async (req, res, next) => {
   let result = await getGem(id);
   if (!result) return next(new AppError(`Gem not found`, 404));
 
-  
   if (
     req.user.role !== "admin" &&
     req.user._id.toString() !== result.createdBy?._id.toString()
@@ -192,38 +190,35 @@ const updateGem = catchAsyncError(async (req, res, next) => {
   }
 
   const updateData = { ...req.body };
-  
+
   let finalImages = [];
-  
+
   if (req.body.oldImages) {
-    finalImages = Array.isArray(req.body.oldImages) 
-      ? req.body.oldImages 
+    finalImages = Array.isArray(req.body.oldImages)
+      ? req.body.oldImages
       : [req.body.oldImages];
   }
-  
+
   if (req.files?.images && req.files.images.length > 0) {
     for (const file of req.files.images) {
       const cloudinaryResult = await uploadToCloudinary(file.buffer, "gems");
       finalImages.push(cloudinaryResult.secure_url);
     }
   }
-  
+
   if (finalImages.length > 0) {
     updateData.images = finalImages;
   }
 
-
-    result = await updateTheGem(id, updateData);
-    res.status(200).json({ message: "Gem updated successfully", result });
- 
-  
+  result = await updateTheGem(id, updateData);
+  res.status(200).json({ message: "Gem updated successfully", result });
 });
 const deleteGem = catchAsyncError(async (req, res, next) => {
   const { id } = req.params;
   let result = await getGem(id);
   if (!result) return next(new AppError(`Gem not found`, 404));
   if (
-        req.user.role !== "admin" &&
+    req.user.role !== "admin" &&
     req.user._id.toString() !== result.createdBy?._id.toString()
   ) {
     return next(new AppError(`You are not allowed to delete this gem`, 403));
@@ -233,7 +228,6 @@ const deleteGem = catchAsyncError(async (req, res, next) => {
   res.status(200).json({ message: "Gem deleted successfully", result });
 });
 
-
 export {
   getAllGems,
   getGemById,
@@ -242,5 +236,5 @@ export {
   changeGemStatus,
   createGem,
   updateGem,
-  deleteGem
+  deleteGem,
 };
