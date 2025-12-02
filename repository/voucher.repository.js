@@ -15,6 +15,12 @@ export const getVoucherByUserIdAndGemId = async (userId, gemId) => {
 export const deleteVoucherByCode = async (code) => {
     return await voucherModel.findOneAndDelete({code: code});
 }
+export const deleteVoucherByIdAndUserId = async (voucherId, userId) => {
+    return await voucherModel.findOneAndDelete({
+        _id: voucherId,
+        userId: userId
+    });
+}
 
 export const getAllVouchersForUser = async (id) => {
     return await voucherModel.find({userId: id});

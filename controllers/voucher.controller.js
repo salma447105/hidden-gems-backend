@@ -8,17 +8,14 @@ import QRCode from "qrcode";
 import { getGem } from "../repository/gem.repo.js";
 import { logActivity } from "./activity.controller.js";
 
-// const createVoucherForAllSubcribedUsers = catchAsyncError(async (req, res) => {
-//     const voucherCode = "PLATINUM-";
-//     const voucher = {
-//         code: voucherCode,
-//         discount: 20,
-//         expirYdate: new Date(new Date().setMonth(new Date().getMonth() + 1)),
-//         userId: null
-//     }
-//     const getAllSubscribedUsers = [];
-// })
-
+const getAllVouchers = catchAsyncError(async (req, res, next) => {
+    const userId = req.user._id;
+    const vouchers = await voucherRepository.getAllVouchersForUser(userId);
+    if(vouchers.length <= 0) {
+        return res.status(200).send({message: "User don't has any voucher."})
+    }
+    res.status(200).send(vouchers);
+})
 const createVoucherForUser = catchAsyncError(async (req, res, next) => {
     const userId = req.user._id;
     const gemId = req.params.gemId;
@@ -145,5 +142,13 @@ const redeemVoucher = catchAsyncError(async (req, res, next) => {
 
 const deleteVoucherForUser = catchAsyncError(async (req, res, next) => {
     //todo delete voucher by user
+    const userId = req.user._id;
+    const {voucherId} = req.params;
+    const voucher = voucherRepository.deleteVoucherByIdAndUserId(voucherId, userId);
+    if(!voucher) {
+        return next(new AppError("Voucher can not be found.", 404));
+    }
+    logActivity(req.user, "User deleted a voucher", "You deleted on of your own vouchers", true);
+    res.status(200).send({voucher});
 })
-export { createVoucherForUser, getVoucherByCode, redeemVoucher };
+export { createVoucherForUser, getVoucherByCode, redeemVoucher, getAllVouchers, deleteVoucherForUser };

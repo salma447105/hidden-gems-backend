@@ -1,11 +1,13 @@
 import express from 'express';
 import { allowedTo, protectedRoutes } from '../controllers/auth.controller.js';
-import { createVoucherForUser, getVoucherByCode, redeemVoucher } from '../controllers/voucher.controller.js';
+import { createVoucherForUser, deleteVoucherForUser, getAllVouchers, getVoucherByCode, redeemVoucher } from '../controllers/voucher.controller.js';
 
 const router = express.Router();
 
+router.get("/", protectedRoutes, getAllVouchers)
 router.post('/create/:gemId', protectedRoutes, createVoucherForUser);
 router.get('/details/:code', protectedRoutes, getVoucherByCode);
 router.post('/redeem/:code', protectedRoutes,allowedTo('admin'), redeemVoucher);
+router.delete('/:voucherId', protectedRoutes, deleteVoucherForUser);
 
 export default router;
