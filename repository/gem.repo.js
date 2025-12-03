@@ -5,7 +5,7 @@ const getGemsPromise = async () => {
   return await gemModel.find({});
 };
 const getGemsQuery = () => {
-  return gemModel.find();
+  return gemModel.find().select("-embeddings");;
 };
 //why ? because getGemsPromise return a promise that doesn't have the query methods like skip at (ApiFeatures)
 //  but getGemsQuery return a query that has the query methods like skip

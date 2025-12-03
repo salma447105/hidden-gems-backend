@@ -7,7 +7,7 @@ const router = express.Router();
 router.get("/", protectedRoutes, getAllVouchers)
 router.post('/create/:gemId', protectedRoutes, createVoucherForUser);
 router.get('/details/:code', protectedRoutes, getVoucherByCode);
-router.post('/redeem/:code', protectedRoutes,allowedTo('admin'), redeemVoucher);
+router.post('/redeem/:code', protectedRoutes,allowedTo('owner'), redeemVoucher);
 router.delete('/:voucherId', protectedRoutes, deleteVoucherForUser);
 
 export default router;
