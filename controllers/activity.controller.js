@@ -5,7 +5,7 @@ import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { AppError } from "../utils/AppError.js";
 
 const getAllActivities = catchAsyncError(async (req, res, next) => {
-  const userId = req.params.id;
+  const userId = req.user._id;
 
   const countQuery = new ApiFeatures(getAllActivitiesForUser(userId), req.query)
     .filter()
@@ -44,7 +44,7 @@ const postActivity = catchAsyncError(async (req, res) => {
 })
 
 const deleteActivity = catchAsyncError(async (req, res, next) => {
-    const activityId = req.params.id;
+    const {activityId} = req.params;
     const deletedActivity = await deleteActivityById(activityId);
     if(!deletedActivity) {
         return next(new AppError("Activity not found", 404));

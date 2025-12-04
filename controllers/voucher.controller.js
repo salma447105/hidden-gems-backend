@@ -12,7 +12,7 @@ const getAllVouchers = catchAsyncError(async (req, res, next) => {
     const userId = req.user._id;
     const vouchers = await voucherRepository.getAllVouchersForUser(userId);
     if(vouchers.length <= 0) {
-        return next(new AppError("User don't has any vouchers", 404));
+        return next(new AppError("User don't has any vouchers"), 404);
     }
     res.status(200).send(vouchers);
 })
