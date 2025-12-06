@@ -7,3 +7,7 @@ export const createTransactionVoucher = async (voucher) => {
 export const getAllTransactionsById = async (id) => {
     return await transactionVoucherModel.find({user: id});
 }
+
+export const getAllTransactionsByIdQuery = (id) => {
+    return transactionVoucherModel.find({user: id});
+}

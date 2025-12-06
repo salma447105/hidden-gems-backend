@@ -183,7 +183,7 @@ const getAllVouchersForOwner = catchAsyncError(async (req, res, next) => {
     const apifeatures = new ApiFeatures(voucherRepository.getAllVouchersByGemIdQuery(gemId), 
     req.query)
         .paginate();
-    const countQuery = new ApiFeatures(voucherRepository.getAllVouchersQuery(), req.query)
+    const countQuery = new ApiFeatures(voucherRepository.getAllVouchersByGemIdQuery(gemId), req.query)
         .filter()
         .search();
     
