@@ -63,7 +63,8 @@ const createVoucherForUser = catchAsyncError(async (req, res, next) => {
         return next(new AppError("Gem does not have applicable discount.", 400));
     }
     const voucherCode =
-        userSubsciptionType.toUpperCase() + "-" + userId.toString().slice(0, 5);
+        userSubsciptionType.toUpperCase() + "-" + Math.floor(100000 + Math.random() * 900000).toString();
+        console.log(voucherCode);
     const voucher = {
         code: voucherCode,
         discount: gemDiscount,
