@@ -15,30 +15,27 @@ import { protectedRoutes } from "../controllers/auth.controller.js";
 
 const ratingRouter = express.Router();
 
-ratingRouter.use(protectedRoutes);
-
 ratingRouter.route("/")
-    .post(validation(ratingSchema), createRating);
+  .post(protectedRoutes, validation(ratingSchema), createRating);
 
 ratingRouter.route("/:id")
-    .get(getRatingById)
-    .put(validation(ratingUpdateSchema), updateRating)
-    .delete(deleteRating);
+  .get(protectedRoutes, getRatingById)
+  .put(protectedRoutes, validation(ratingUpdateSchema), updateRating)
+  .delete(protectedRoutes, deleteRating);
 
 ratingRouter.route("/gem/:gemId")
-    .get(getAllGemRatings)
+  .get(getAllGemRatings);
 
 ratingRouter.route("/user/:userId")
-    .get(getAllUserRatings)
+  .get(protectedRoutes, getAllUserRatings);
 
-ratingRouter.route("/gem/:gemId/avg")    
-    .get(getGemAvgRating)    
+ratingRouter.route("/gem/:gemId/avg")
+  .get(protectedRoutes, getGemAvgRating);
 
 ratingRouter.route("/user/:id/gem/:gemId")
-    .get( getUserRatingForGem);
+  .get(protectedRoutes, getUserRatingForGem);
 
 ratingRouter.route("/my/ratings")
-    .get(getAllUserRatings);
-    
-    
+  .get(protectedRoutes, getAllUserRatings);
+
 export default ratingRouter;
