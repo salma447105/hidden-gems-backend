@@ -25,3 +25,15 @@ export const deleteVoucherByIdAndUserId = async (voucherId, userId) => {
 export const getAllVouchersForUser = async (id) => {
     return await voucherModel.find({userId: id});
 }
+
+export const getAllVouchersByGemId = async (gemId) => {
+    return await voucherModel.find({gemId: gemId});
+}
+
+export const getAllVouchersQuery =  () => {
+    return voucherModel.find({});
+}
+
+export const getAllVouchersByGemIdQuery = (gemId) => {
+    return voucherModel.find({gemId: gemId});
+}

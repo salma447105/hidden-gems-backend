@@ -7,6 +7,28 @@ import voucherTypes from "../utils/voucherTypes.js";
 import QRCode from "qrcode";
 import { getGem } from "../repository/gem.repo.js";
 import { logActivity } from "./activity.controller.js";
+import { ApiFeatures } from "../utils/ApiFeatures.js";
+
+const getAllVouchersForAdmin = catchAsyncError(async (req, res, next) => {
+    const adminId = req.user._id;
+    // const vouchers = await voucherRepository.getAllVouchers();
+    const countQuery = new ApiFeatures(voucherRepository.getAllVouchersQuery(), req.query)
+        .filter()
+        .search();
+    
+    const totalItems = await countQuery.mongooseQuery.countDocuments();
+    const features = new ApiFeatures(voucherRepository.getAllVouchersQuery(), req.query)
+        .paginate()
+    const totalPages = Math.ceil(totalItems / features.limit);
+    const result = await features.mongooseQuery;
+    res.status(200).send({
+        message: "success",
+        page: features.page,
+        totalItems,
+        totalPages,
+        result,
+    });
+})
 
 const getAllVouchers = catchAsyncError(async (req, res, next) => {
     const userId = req.user._id;
@@ -64,7 +86,6 @@ const createVoucherForUser = catchAsyncError(async (req, res, next) => {
     }
     const voucherCode =
         userSubsciptionType.toUpperCase() + "-" + Math.floor(100000 + Math.random() * 900000).toString();
-        console.log(voucherCode);
     const voucher = {
         code: voucherCode,
         discount: gemDiscount,
@@ -156,4 +177,30 @@ const deleteVoucherForUser = catchAsyncError(async (req, res, next) => {
     logActivity(req.user, "User deleted a voucher", "You deleted one of your own vouchers", true);
     res.status(200).send({voucher});
 })
-export { createVoucherForUser, getVoucherByCode, redeemVoucher, getAllVouchers, deleteVoucherForUser };
+
+const getAllVouchersForOwner = catchAsyncError(async (req, res, next) => {
+    const {gemId} = req.params;
+    const apifeatures = new ApiFeatures(voucherRepository.getAllVouchersByGemIdQuery(gemId), 
+    req.query)
+        .paginate();
+    const countQuery = new ApiFeatures(voucherRepository.getAllVouchersQuery(), req.query)
+        .filter()
+        .search();
+    
+    const totalItems = await countQuery.mongooseQuery.countDocuments();
+    const result = await apifeatures.mongooseQuery;
+    // const vouchers = await voucherRepository.getAllVouchersByGemIdQuery(gemId);
+    if(result.length <= 0) {
+        return next(new AppError("There is not active vouchers for your gem yet.", 400));
+    }
+   const totalPages = Math.ceil(totalItems / features.limit);
+    
+    res.status(200).send({
+        message: "success",
+        page: features.page,
+        totalItems,
+        totalPages,
+        result,
+    });
+})
+export { createVoucherForUser, getVoucherByCode, redeemVoucher, getAllVouchers, deleteVoucherForUser, getAllVouchersForOwner, getAllVouchersForAdmin };
