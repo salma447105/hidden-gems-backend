@@ -147,6 +147,7 @@ const redeemVoucher = catchAsyncError(async (req, res, next) => {
         decision: desicion,
         admin: req.user._id,
         redeemedAt: new Date(),
+        user: voucher.userId
     };
     const transactionedVocuher =
         await transactionVoucherRepository.createTransactionVoucher(voucherData);

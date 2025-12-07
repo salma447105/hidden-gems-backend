@@ -11,3 +11,11 @@ export const getAllTransactionsById = async (id) => {
 export const getAllTransactionsByIdQuery = (id) => {
     return transactionVoucherModel.find({user: id});
 }
+
+export const getAllTransactionsByGemIdQuery = (gemId) => {
+    return transactionVoucherModel.find({gemId: gemId});
+}
+
+export const getAllTransActionQuery = () => {
+    return transactionVoucherModel.find({});
+}
