@@ -4,7 +4,7 @@ import { getAllTransActionForAdmin, getAllTransActionForUser, getAllTransActions
 const router = express.Router();
 
 router.get("/", protectedRoutes, getAllTransActionForUser);
-router.get("/:id", protectedRoutes, getTransActionById);
 router.get("/admin", protectedRoutes, allowedTo("admin"), getAllTransActionForAdmin);
 router.get("/owner/:gemId", protectedRoutes, allowedTo("owner"), getAllTransActionsForOwner);
+router.get("/:id", protectedRoutes, getTransActionById);
 export default router;

@@ -4,11 +4,11 @@ import { AppError } from "../utils/AppError.js";
 import * as repository from "../repository/transactionVocuher.repository.js";
 
 const getTransActionById = catchAsyncError(async (req, res, next) => {
-    const {gemId} = req.params;
-    if(!gemId) {
+    const {id} = req.params;
+    if(!id) {
         return next(new AppError("Gem Id is required", 400));
     }
-    const transactionVocuher = repository.getTransActionById(gemId);
+    const transactionVocuher = await repository.getTransActionById(id);
     if(!transactionVocuher) {
         return res.status(404).send({message: "Transction voucher not found"});
     }
