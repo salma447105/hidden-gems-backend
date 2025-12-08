@@ -194,11 +194,11 @@ const getAllVouchersForOwner = catchAsyncError(async (req, res, next) => {
     if(result.length <= 0) {
         return next(new AppError("There is not active vouchers for your gem yet.", 400));
     }
-   const totalPages = Math.ceil(totalItems / features.limit);
+   const totalPages = Math.ceil(totalItems / apifeatures.limit);
     
     res.status(200).send({
         message: "success",
-        page: features.page,
+        page: apifeatures.page,
         totalItems,
         totalPages,
         result,

@@ -7,8 +7,8 @@ export const createVoucher = async (voucherData) => {
 export const getVoucherByCode = async (code) => {
   return await voucherModel
     .findOne({ code: code })
-    .populate("gemId")
-    .populate("userId");
+    .populate("gemId","name category")
+    .populate("userId"," firstName lastName email");
 };
 
 export const getVoucherByUserIdAndGemId = async (userId, gemId) => {
