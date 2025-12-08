@@ -17,8 +17,7 @@ const getUserAllWishlist = catchAsyncError(async (req, res, next) => {
     .paginate();
 
   const result = await apiFeatures.mongooseQuery
-    .populate("gemId", "-embeddings")
-    .populate("userId", "firstName lastName email");
+
 
   const totalPages = Math.ceil(totalItems / apiFeatures.limit);
 
