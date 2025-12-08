@@ -15,7 +15,7 @@ const getTransActionById = catchAsyncError(async (req, res, next) => {
     return res.status(200).send(transactionVocuher);
 })
 const getAllTransActionForUser = catchAsyncError(async (req, res, next) => {
-    const id = "692c3c705e5fa2ca7926577c";
+    const id = req.user._id;
     const apifeatures = new ApiFeatures(repository.getAllTransactionsByIdQuery(id), req.query)
             .filter()
             .search()
