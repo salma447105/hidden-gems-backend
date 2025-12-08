@@ -5,8 +5,9 @@ import {  uploadMultipleFiles } from "../middleware/fileUpload.js";
 const router = express.Router();
 
 //get all reviews for a place
+router.get("/allReviews", reviewController.getAllReviewsForAllGems);
+router.get("/",protectedRoutes, reviewController.getReviewByUserId);
 router.get("/:id", reviewController.getAllReviewsByGemId);
-router.get("/", reviewController.getAllReviewsForAllGems);
 router.post("/",protectedRoutes, uploadMultipleFiles([
     { name: "images", maxCount: 4 }
   ]), reviewController.postReview);

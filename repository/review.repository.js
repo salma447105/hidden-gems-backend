@@ -11,6 +11,10 @@ export const getAllReviews = () => {
     return reviewModel.find().populate({path: "userId", select: "firstName lastName"});
 }
 
+export const getReviewByAuthorId = async (id) => {
+    return reviewModel.findOne({userId: id});
+}
+
 export const getAllReviewsForGem = (gemId) => {
     return reviewModel.find({gemId: gemId})
         .populate({path: "userId", select: "firstName lastName"});

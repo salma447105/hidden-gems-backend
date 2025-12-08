@@ -8,6 +8,7 @@ import {
   getAllReviewsForGem,
   updateReviewById,
   getAllReviews,
+  getReviewByAuthorId,
 } from "../repository/review.repository.js";
 import { ApiFeatures } from "../utils/ApiFeatures.js";
 import { AppError } from "../utils/AppError.js";
@@ -24,6 +25,14 @@ import { logActivity } from "./activity.controller.js";
 //     return res.status(200).send(result);
 // })
 
+const getReviewByUserId = catchAsyncError(async (req, res, next) => {
+  const userId = req.user._id;
+  const userPost = await getReviewByAuthorId(userId);
+  if(!userPost._id) {
+    return next(new AppError("Review not found.", 404));
+  }
+  return res.status(200).send(userPost);
+})
 const getAllReviewsForAllGems = catchAsyncError(async (req, res, next) => {
   const countQuery = new ApiFeatures(getAllReviews(), req.query)
     .filter()
@@ -70,6 +79,10 @@ const getAllReviewsByGemId = catchAsyncError(async (req, res, next) => {
 const postReview = catchAsyncError(async (req, res, next) => {
   const reviewObj = req.body;
   const userId = req.user._id;
+  const isExist = await getReviewByAuthorId(userId);
+  if(isExist) {
+    return next(new AppError("User already has a review.", 400));
+  }
   let images = [];
 
   if (req.files?.images?.length) {
@@ -131,4 +144,5 @@ export {
   postReview,
   deleteReview,
   updateReview,
+  getReviewByUserId
 };
