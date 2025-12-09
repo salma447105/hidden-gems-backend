@@ -7,7 +7,7 @@ const getTheRating = async (id) => {
 };
 
 const getTheGemRatings = async (gemId) => {
-  return await ratingModel.find({gem: gemId}).sort({ createdAt: -1 });
+  return await ratingModel.find({gem: gemId}).sort({ createdAt: -1 }).populate('createdBy', 'firstName lastName');
 };
 
 const getUserRatings = async (userId) => {

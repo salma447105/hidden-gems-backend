@@ -8,6 +8,7 @@ import {
   getAllGemsForCategory,
   getAllGemsForUser,
   changeGemStatus,
+  getAllSubscribedGems,
 } from "../controllers/gem.controller.js";
 import { uploadMultipleFiles } from "../middleware/fileUpload.js";
 import { validation } from "../middleware/validation.js";
@@ -33,6 +34,10 @@ gemRouter
   )
   .get(getAllGems);
 
+
+  gemRouter
+  .route("/subscribed")
+  .get(getAllSubscribedGems);
 gemRouter
   .route("/:id")
   .get(getGemById)

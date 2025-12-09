@@ -11,6 +11,7 @@ import {
   findGemByName,
   getGemsByUserId,
   getGemsByCategoryId,
+  getSubscribedGemsQuery,
 } from "../repository/gem.repo.js";
 import { increaseUserPointsHelper } from "./user.controller.js";
 import { createEmbeddings } from "../ai/createEmbeddings.js";
@@ -24,6 +25,34 @@ const getAllGems = catchAsyncError(async (req, res, next) => {
   const totalItems = await countQuery.mongooseQuery.countDocuments();
 
   const apifeatures = new ApiFeatures(getGemsQuery(), req.query)
+    .filter()
+    .search()
+    .sort()
+    .fields()
+    .paginate();
+
+  const result = await apifeatures.mongooseQuery
+    .populate("createdBy", "firstName lastName email")
+    .populate("category", "categoryName categoryImage");
+
+  const totalPages = Math.ceil(totalItems / apifeatures.limit);
+
+  return res.status(200).json({
+    message: "success",
+    page: apifeatures.page,
+    totalItems,
+    totalPages,
+    result,
+  });
+});
+const getAllSubscribedGems = catchAsyncError(async (req, res, next) => {
+  const countQuery = new ApiFeatures(getSubscribedGemsQuery(), req.query)
+    .filter()
+    .search();
+
+  const totalItems = await countQuery.mongooseQuery.countDocuments();
+
+  const apifeatures = new ApiFeatures(getSubscribedGemsQuery(), req.query)
     .filter()
     .search()
     .sort()
@@ -251,4 +280,5 @@ export {
   createGem,
   updateGem,
   deleteGem,
+  getAllSubscribedGems
 };
