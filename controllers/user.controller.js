@@ -3,7 +3,8 @@ import { userModel } from "../models/user.js";
 import { AppError } from "../utils/AppError.js";
 import bcrypt from "bcrypt";
 import { ApiFeatures } from "../utils/ApiFeatures.js";
-import { uploadToCloudinary } from "../middleware/cloudinaryConfig.js";     
+import { uploadToCloudinary } from "../middleware/cloudinaryConfig.js"; 
+import { getUserById } from "../repository/user.repo.js";    
 
 const createUser = catchAsyncError(async (req, res, next) => {
   let isExist = await userModel.findOne({ email: req.body.email });
@@ -145,4 +146,30 @@ const deleteUser = catchAsyncError(async (req, res, next) => {
   res.status(200).json({ message: "User deleted successfully", result });
 });
 
-export { createUser, getUser, getAllUsers, deleteUser, updateUser };
+//helper function for gem controller called
+const increaseUserPointsHelper = async (userId, points = 10) => {
+  
+  console.log(userId);
+  try {
+    const user = await userModel.findById(userId);
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    user.points += points;
+    await user.save();
+
+    return user;
+  } catch (error) {
+    throw new AppError(error.message, 400);
+  }
+};
+
+export {
+  createUser,
+  getUser,
+  getAllUsers,
+  deleteUser,
+  updateUser,
+  increaseUserPointsHelper,
+};

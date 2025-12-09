@@ -12,6 +12,7 @@ import {
   getGemsByUserId,
   getGemsByCategoryId,
 } from "../repository/gem.repo.js";
+import { increaseUserPointsHelper } from "./user.controller.js";
 import { createEmbeddings } from "../ai/createEmbeddings.js";
 import { uploadToCloudinary } from "../middleware/cloudinaryConfig.js";
 
@@ -133,6 +134,15 @@ const changeGemStatus = catchAsyncError(async (req, res, next) => {
     return next(new AppError("Only admins can change gem status", 403));
   }
 
+    const userId = result.createdBy?._id
+      ? result.createdBy._id
+      : result.createdBy;
+    if (status === "accepted" && result.status !== "accepted") {
+      if (userId) {
+        await increaseUserPointsHelper(userId, 10);
+      }
+    }
+
   const updatedGem = await updateTheGem(gemId, { status });
   res.status(200).json({
     message: `Gem status updated to ${status} successfully`,
@@ -167,6 +177,10 @@ const createGem = catchAsyncError(async (req, res, next) => {
   let result = await createTheGem(gemData);
   result.embeddings = await createEmbeddings(result.description);
   await result.save();
+
+   if (status === "accepted") {
+     await increaseUserPointsHelper(req.user._id, 10);
+   }
 
   if (status === "accepted") {
     res.status(200).json({ message: "Gem created successfully", result });
